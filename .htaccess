@@ -1,0 +1,38 @@
+# .htaccess в папке max_bot
+RewriteEngine On
+
+# Защита конфигурационных файлов
+<FilesMatch "^(config\.php|\.htaccess|\.env|composer\.json|composer\.lock)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Защита папки с логами
+<IfModule mod_authz_core.c>
+    <Directory "logs">
+        Require all denied
+    </Directory>
+</IfModule>
+
+# Настройки PHP
+php_value upload_max_filesize 50M
+php_value post_max_size 50M
+php_value max_execution_time 300
+php_value memory_limit 256M
+
+# ЧПУ для API
+RewriteRule ^api/(.*)$ admin_api.php?action=$1 [QSA,L]
+
+# Основной обработчик для webhook
+<Files "index.php">
+    Order Allow,Deny
+    Allow from all
+</Files>
+
+# Кеширование
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/jpeg "access plus 1 month"
+    ExpiresByType image/png "access plus 1 month"
+    ExpiresByType image/gif "access plus 1 month"
+</IfModule>
